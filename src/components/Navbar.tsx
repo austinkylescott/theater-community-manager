@@ -20,6 +20,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
+import AuthButtons from "./auth/AuthButtons";
 
 type Route = {
   name: string;
@@ -45,8 +46,8 @@ export default function Navbar({ routes = defaultRoutes }: NavbarProps) {
   const [open, setOpen] = React.useState(false);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between px-4">
+    <header className="border-border bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur">
+      <div className="container mx-auto flex h-16 items-center justify-between px-4">
         {/* Logo */}
         <Link href="/" className="flex items-center space-x-2">
           <span className="text-xl font-bold">Logo</span>
@@ -71,16 +72,19 @@ export default function Navbar({ routes = defaultRoutes }: NavbarProps) {
         </NavigationMenu>
 
         {/* Spacer for desktop to keep nav centered */}
-        <div className="hidden md:block w-[60px]" />
+        {/* <div className="hidden w-[60px] md:block" /> */}
 
         {/* Mobile Navigation - Visible only on mobile */}
         <Sheet open={open} onOpenChange={setOpen}>
-          <SheetTrigger asChild className="md:hidden">
-            <Button variant="ghost" size="icon">
-              <Menu />
-              <span className="sr-only">Toggle menu</span>
-            </Button>
-          </SheetTrigger>
+          <div className="flex">
+            <AuthButtons />
+            <SheetTrigger asChild className="md:hidden">
+              <Button variant="ghost" size="icon">
+                <Menu />
+                <span className="sr-only">Toggle menu</span>
+              </Button>
+            </SheetTrigger>
+          </div>
 
           <SheetContent aria-describedby="mobile navbar" side="bottom">
             <SheetHeader>
@@ -98,8 +102,8 @@ export default function Navbar({ routes = defaultRoutes }: NavbarProps) {
                   href={route.href}
                   onClick={() => setOpen(false)}
                   className={cn(
-                    "text-lg font-medium transition-colors hover:text-primary",
-                    "px-2 py-1 rounded-md hover:bg-accent"
+                    "hover:text-primary text-lg font-medium transition-colors",
+                    "hover:bg-accent rounded-md px-2 py-1",
                   )}
                 >
                   {route.name}

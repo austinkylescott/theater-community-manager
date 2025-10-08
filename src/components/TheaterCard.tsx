@@ -21,14 +21,14 @@ export const TheaterCardContainer = ({
 }: Readonly<{
   children: React.ReactNode;
 }>) => {
-  return <div className="grid lg:grid-cols-2 gap-2">{children}</div>;
+  return <div className="grid gap-4 p-4 lg:grid-cols-2">{children}</div>;
 };
 
 const TheaterCard = () => {
   return (
     <Card>
-      <CardHeader className="justify-center ">
-        <CardTitle className="flex items-center text-2xl md:text-3xl gap-2">
+      <CardHeader className="justify-center">
+        <CardTitle className="flex items-center gap-2 text-2xl text-balance md:text-3xl">
           <Avatar>
             <AvatarImage
               alt="Theater avatar"
@@ -38,11 +38,12 @@ const TheaterCard = () => {
           </Avatar>
           The Focus Theater
         </CardTitle>
-        <CardDescription className="hidden sm:flex flex-col gap-1">
+        <CardDescription className="hidden flex-col gap-1 sm:flex">
           <span>Rochester&apos;s Home for Improv Comedy</span>
-
+        </CardDescription>
+        <CardDescription>
           <span className="flex flex-row items-center">
-            <MapPin aria-hidden="true" className="shrink-0 size-[1em] mr-1" />
+            <MapPin aria-hidden="true" className="mr-1 size-[1em] shrink-0" />
             <span>260 E. Main St. Rochester, NY 14604</span>
           </span>
         </CardDescription>
@@ -61,16 +62,14 @@ const TheaterCard = () => {
       </CardHeader>
       <CardContent>
         <p>Upcoming Shows</p>
-        <ul>
+        <ul className="hidden sm:block">
           <li>Ants to Gods</li>
           <li>JFT & Friends</li>
           <li>Nerds in a Basement</li>
         </ul>
       </CardContent>
       <CardFooter>
-        <p>Short Form Tag</p>
-        <p>Long Form Tag</p>
-        <p>Musical Tag</p>
+        <p>See full schedule</p>
       </CardFooter>
     </Card>
   );
