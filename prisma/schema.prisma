@@ -1,0 +1,81 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String            @id @default(cuid())
+  email       String            @unique
+  name        String?
+  image       String?
+  memberships Membership[]
+  performer   PerformerProfile?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  LineupSlot  LineupSlot[]
+}
+
+model Theater {
+  id          String       @id @default(cuid())
+  name        String
+  memberships Membership[]
+  shows       Show[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model Membership {
+  id        String  @id @default(cuid())
+  userId    String
+  theaterId String
+  role      Role
+  user      User    @relation(fields: [userId], references: [id])
+  theater   Theater @relation(fields: [theaterId], references: [id])
+
+  @@unique([userId, theaterId])
+}
+
+enum Role {
+  MANAGER
+  PRODUCER
+  PERFORMER
+}
+
+model PerformerProfile {
+  id          String  @id @default(cuid())
+  userId      String  @unique
+  displayName String
+  headshotUrl String?
+  bio         String?
+  tags        Json?
+  user        User    @relation(fields: [userId], references: [id])
+}
+
+model Show {
+  id        String       @id @default(cuid())
+  theaterId String
+  title     String
+  dateTime  DateTime
+  venueName String?
+  notes     String?
+  theater   Theater      @relation(fields: [theaterId], references: [id])
+  slots     LineupSlot[]
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+}
+
+model LineupSlot {
+  id          String  @id @default(cuid())
+  showId      String
+  order       Int
+  label       String
+  performerId String?
+  show        Show    @relation(fields: [showId], references: [id])
+  performer   User?   @relation(fields: [performerId], references: [id])
+}

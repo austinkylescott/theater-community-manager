@@ -20,18 +20,17 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Navbar />
-        <div className="container mx-auto items-center justify-between px-4">
-          {children}
-        </div>
+        {/* Match the navbar’s shell */}
+        <main className="site-shell py-6">{children}</main>
       </body>
     </html>
   );
