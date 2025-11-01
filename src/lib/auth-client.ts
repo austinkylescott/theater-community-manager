@@ -1,18 +1,30 @@
 "use client";
 
 import { createAuthClient } from "better-auth/react";
+import { magicLinkClient } from "better-auth/client/plugins";
 
-export const authClient = createAuthClient();
+export const authClient = createAuthClient({
+  plugins: [magicLinkClient()],
+});
 
 export const useSession = () => authClient.useSession();
 
-export const signIn = async () => {
+export const signInWithGitHub = async () => {
   try {
     await authClient.signIn.social({
       provider: "github",
     });
   } catch (error) {
     console.error("GitHub sign-in failed:", error);
+    throw error;
+  }
+};
+
+export const signInWithMagicLink = async () => {
+  try {
+    await authClient.signIn.magicLink({ email: "austin.scott18@gmail.com" });
+  } catch (error) {
+    console.error("Magic link sign-in failed: ", error);
     throw error;
   }
 };

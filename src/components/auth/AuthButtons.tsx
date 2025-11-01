@@ -1,6 +1,6 @@
 "use client";
 
-import { signIn, signOut, useSession } from "@/lib/auth-client";
+import { signInWithGitHub, signOut, useSession } from "@/lib/auth-client";
 import { Button } from "../ui/button";
 
 const AuthButtons = () => {
