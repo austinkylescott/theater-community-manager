@@ -12,8 +12,11 @@ datasource db {
 model User {
   id          String            @id @default(cuid())
   email       String            @unique
+  emailVerified Boolean         @default(false)
   name        String?
   image       String?
+  sessions    Session[]
+  accounts    Account[]
   memberships Membership[]
   performer   PerformerProfile?
   createdAt   DateTime          @default(now())
@@ -78,4 +81,48 @@ model LineupSlot {
   performerId String?
   show        Show    @relation(fields: [showId], references: [id])
   performer   User?   @relation(fields: [performerId], references: [id])
+}
+
+model Session {
+  id         String   @id @default(cuid())
+  token      String   @unique
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt  DateTime
+  ipAddress  String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Account {
+  id                     String   @id @default(cuid())
+  userId                 String
+  user                   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  providerId             String
+  accountId              String
+  accessToken            String?
+  refreshToken           String?
+  idToken                String?
+  accessTokenExpiresAt   DateTime?
+  refreshTokenExpiresAt  DateTime?
+  scope                  String?
+  password               String?
+  sessionState           String?
+  tokenType              String?
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  @@unique([providerId, accountId])
+}
+
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([identifier, value])
 }
