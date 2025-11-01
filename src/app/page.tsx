@@ -1,3 +1,3 @@
 export default function Home() {
-  return <main>some shit</main>;
+  return <main>Home Page</main>;
 }
