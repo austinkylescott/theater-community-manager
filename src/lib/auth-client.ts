@@ -37,3 +37,28 @@ export const signOut = async () => {
     throw error;
   }
 };
+
+export const signUpWithEmail = async (data: {
+  email: string;
+  password: string;
+  name: string;
+}) => {
+  try {
+    await authClient.signUp.email(data);
+  } catch (error) {
+    console.error("Email sign-up failed:", error);
+    throw error;
+  }
+};
+
+export const signInWithEmail = async (data: {
+  email: string;
+  password: string;
+}) => {
+  try {
+    await authClient.signIn.email(data);
+  } catch (error) {
+    console.error("Email sign-in failed:", error);
+    throw error;
+  }
+};
