@@ -44,7 +44,12 @@ export const signUpWithEmail = async (data: {
   name: string;
 }) => {
   try {
-    await authClient.signUp.email(data);
+    const result = await authClient.signUp.email(data);
+    const errorMessage = (result as { error?: { message?: string } })?.error
+      ?.message;
+    if (errorMessage) {
+      throw new Error(errorMessage);
+    }
   } catch (error) {
     console.error("Email sign-up failed:", error);
     throw error;
@@ -56,7 +61,12 @@ export const signInWithEmail = async (data: {
   password: string;
 }) => {
   try {
-    await authClient.signIn.email(data);
+    const result = await authClient.signIn.email(data);
+    const errorMessage = (result as { error?: { message?: string } })?.error
+      ?.message;
+    if (errorMessage) {
+      throw new Error(errorMessage);
+    }
   } catch (error) {
     console.error("Email sign-in failed:", error);
     throw error;
