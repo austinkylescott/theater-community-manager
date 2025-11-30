@@ -10,7 +10,7 @@ const AuthButtons = () => {
   const loggedIn = Boolean(user);
 
   const handleSignIn = () => {
-    signIn().catch(() => undefined);
+    signInWithGitHub().catch(() => undefined);
   };
 
   const handleSignOut = () => {

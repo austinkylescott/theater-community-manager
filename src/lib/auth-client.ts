@@ -20,9 +20,9 @@ export const signInWithGitHub = async () => {
   }
 };
 
-export const signInWithMagicLink = async () => {
+export const signInWithMagicLink = async (email: string) => {
   try {
-    await authClient.signIn.magicLink({ email: "austin.scott18@gmail.com" });
+    await authClient.signIn.magicLink({ email });
   } catch (error) {
     console.error("Magic link sign-in failed: ", error);
     throw error;
