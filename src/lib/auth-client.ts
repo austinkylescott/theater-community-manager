@@ -9,10 +9,11 @@ export const authClient = createAuthClient({
 
 export const useSession = () => authClient.useSession();
 
-export const signInWithGitHub = async () => {
+export const signInWithGitHub = async (options?: { callbackURL?: string }) => {
   try {
     await authClient.signIn.social({
       provider: "github",
+      callbackURL: options?.callbackURL,
     });
   } catch (error) {
     console.error("GitHub sign-in failed:", error);

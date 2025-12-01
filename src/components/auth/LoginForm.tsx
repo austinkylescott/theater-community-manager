@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, FormEvent } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { signInWithEmail, signInWithGitHub } from "@/lib/auth-client";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -27,6 +27,12 @@ const loginSchema = z.object({
 
 export function LoginForm({ ...props }: React.ComponentProps<typeof Card>) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callback = searchParams.get("callback");
+  const redirectTarget = callback || "/theaters";
+  const signupHref = callback
+    ? `/signup?callback=${encodeURIComponent(callback)}`
+    : "/signup";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -54,7 +60,7 @@ export function LoginForm({ ...props }: React.ComponentProps<typeof Card>) {
     try {
       setIsSubmitting(true);
       await signInWithEmail(parsed.data);
-      router.push("/theaters");
+      router.replace(redirectTarget);
       router.refresh();
     } catch (err) {
       const message =
@@ -66,7 +72,7 @@ export function LoginForm({ ...props }: React.ComponentProps<typeof Card>) {
   };
 
   const handleGitHub = () => {
-    signInWithGitHub().catch(() => undefined);
+    signInWithGitHub({ callbackURL: redirectTarget }).catch(() => undefined);
   };
 
   return (
@@ -80,6 +86,11 @@ export function LoginForm({ ...props }: React.ComponentProps<typeof Card>) {
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <FieldGroup>
+            {error ? (
+              <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+                {error}
+              </div>
+            ) : null}
             <Field>
               <FieldLabel htmlFor="email">Email</FieldLabel>
               <Input
@@ -107,9 +118,6 @@ export function LoginForm({ ...props }: React.ComponentProps<typeof Card>) {
                 <p className="text-sm text-red-600">{fieldErrors.password}</p>
               ) : null}
             </Field>
-            <Field>
-              {error ? <p className="text-sm text-red-600">{error}</p> : null}
-            </Field>
             <Field className="flex flex-col gap-2">
               <Button type="submit" disabled={isSubmitting}>
                 {isSubmitting ? "Logging in..." : "Log in"}
@@ -118,7 +126,7 @@ export function LoginForm({ ...props }: React.ComponentProps<typeof Card>) {
                 Log in with GitHub
               </Button>
               <FieldDescription className="px-6 text-center">
-                Need an account? <a href="/signup">Sign up</a>
+                Need an account? <a href={signupHref}>Sign up</a>
               </FieldDescription>
             </Field>
           </FieldGroup>

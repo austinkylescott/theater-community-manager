@@ -10,9 +10,12 @@ type SessionShellProps = {
 
 export default async function SessionShell({
   children,
-  redirectTo = "/signup",
+  redirectTo = "/login",
 }: SessionShellProps) {
   const headersList = await headers();
+  const pathname = headersList.get("x-pathname") ?? "";
+  const search = headersList.get("x-search") ?? "";
+  const callbackPath = pathname ? `${pathname}${search}` : null;
 
   const sessionResult = await auth.api.getSession({
     headers: headersList,
@@ -22,7 +25,11 @@ export default async function SessionShell({
     Boolean(sessionResult?.session) || Boolean(sessionResult?.user);
 
   if (!isAuthenticated) {
-    redirect(redirectTo);
+    const destination =
+      callbackPath && redirectTo
+        ? `${redirectTo}${redirectTo.includes("?") ? "&" : "?"}callback=${encodeURIComponent(callbackPath)}`
+        : redirectTo;
+    redirect(destination);
   }
 
   return <>{children}</>;

@@ -1,15 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { signOut, useSession } from "@/lib/auth-client";
 import { Button } from "../ui/button";
 
 const AuthButtons = () => {
+  const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const mockDelayMs = Number(process.env.NEXT_PUBLIC_AUTH_BUTTON_DELAY_MS ?? 0);
   const { data } = useSession();
   const user = data?.user;
   const loggedIn = Boolean(user);
+  const userLabel = user?.name || user?.email;
 
   useEffect(() => {
     if (mockDelayMs > 0) {
@@ -19,8 +22,14 @@ const AuthButtons = () => {
     setMounted(true);
   }, [mockDelayMs]);
 
-  const handleSignOut = () => {
-    signOut().catch(() => undefined);
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      router.replace("/");
+      router.refresh();
+    } catch {
+      // swallow errors here; button will remain visible for another attempt
+    }
   };
 
   if (!mounted) {
@@ -40,7 +49,11 @@ const AuthButtons = () => {
 
   return (
     <div className="flex items-center gap-2">
-      <p>{loggedIn ? `Hi, ${user?.name}` : null}</p>
+      {loggedIn ? (
+        <span className="text-muted-foreground hidden text-xs sm:inline">
+          Signed in as {userLabel}
+        </span>
+      ) : null}
       {loggedIn ? (
         <Button className="hidden sm:flex" variant="secondary">
           Invite

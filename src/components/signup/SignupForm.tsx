@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, FormEvent } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { signInWithGitHub, signUpWithEmail } from "@/lib/auth-client";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -34,6 +34,12 @@ const signupSchema = z
 
 export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callback = searchParams.get("callback");
+  const redirectTarget = callback || "/theaters";
+  const loginHref = callback
+    ? `/login?callback=${encodeURIComponent(callback)}`
+    : "/login";
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -74,7 +80,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
     try {
       setIsSubmitting(true);
       await signUpWithEmail({ email, password, name: cleanedName });
-      router.push("/theaters");
+      router.replace(redirectTarget);
       router.refresh();
     } catch (err) {
       const message =
@@ -88,7 +94,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
   };
 
   const handleGitHub = () => {
-    signInWithGitHub().catch(() => undefined);
+    signInWithGitHub({ callbackURL: redirectTarget }).catch(() => undefined);
   };
 
   return (
@@ -102,6 +108,11 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <FieldGroup>
+            {error ? (
+              <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+                {error}
+              </div>
+            ) : null}
             <Field>
               <FieldLabel htmlFor="name">Full Name</FieldLabel>
               <Input
@@ -180,7 +191,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
                   Sign up with GitHub
                 </Button>
                 <FieldDescription className="px-6 text-center">
-                  Already have an account? <a href="/login">Log in</a>
+                  Already have an account? <a href={loginHref}>Log in</a>
                 </FieldDescription>
               </Field>
             </FieldGroup>
