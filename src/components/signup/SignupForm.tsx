@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, FormEvent } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { signInWithGitHub, signUpWithEmail } from "@/lib/auth-client";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -32,10 +32,12 @@ const signupSchema = z
     path: ["confirmPassword"],
   });
 
-export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
+type SignupFormProps = React.ComponentProps<typeof Card> & {
+  callback?: string | null;
+};
+
+export function SignupForm({ callback, ...props }: SignupFormProps) {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const callback = searchParams.get("callback");
   const redirectTarget = callback || "/theaters";
   const loginHref = callback
     ? `/login?callback=${encodeURIComponent(callback)}`
