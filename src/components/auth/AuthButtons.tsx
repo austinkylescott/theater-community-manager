@@ -2,15 +2,15 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { signOut, useSession } from "@/lib/auth-client";
+import { signOut } from "@/lib/auth-client";
+import { useSessionContext } from "./session-context";
 import { Button } from "../ui/button";
 
 const AuthButtons = () => {
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const mockDelayMs = Number(process.env.NEXT_PUBLIC_AUTH_BUTTON_DELAY_MS ?? 0);
-  const { data } = useSession();
-  const user = data?.user;
+  const { user } = useSessionContext();
   const loggedIn = Boolean(user);
   const userLabel = user?.name || user?.email;
 

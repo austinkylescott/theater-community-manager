@@ -1,6 +1,8 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { prisma } from "@/lib/prisma";
+import { Role } from "@prisma/client";
+import { InferSession, InferUser } from "better-auth";
 import { magicLink } from "better-auth/plugins";
 
 export const auth = betterAuth({
@@ -23,4 +25,24 @@ export const auth = betterAuth({
       clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
     },
   },
+  user: {
+    additionalFields: {
+      role: {
+        type: ["MANAGER", "PRODUCER", "PERFORMER"],
+        required: true,
+        defaultValue: Role.PERFORMER,
+      },
+    },
+  },
 });
+
+export type AppSession = InferSession<typeof auth>;
+export type AppUser = InferUser<typeof auth>;
+
+export const hasRole = (
+  user: Pick<AppUser, "role"> | null | undefined,
+  roles: Role | Role[],
+) => {
+  const allowedRoles = Array.isArray(roles) ? roles : [roles];
+  return Boolean(user && allowedRoles.includes(user.role as Role));
+};

@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
+import { SessionProvider } from "./session-context";
 
 type SessionShellProps = {
   children: ReactNode;
@@ -21,6 +22,8 @@ export default async function SessionShell({
     headers: headersList,
   });
 
+  const user = sessionResult?.user ?? null;
+  const session = sessionResult?.session ?? null;
   const isAuthenticated =
     Boolean(sessionResult?.session) || Boolean(sessionResult?.user);
 
@@ -32,5 +35,7 @@ export default async function SessionShell({
     redirect(destination);
   }
 
-  return <>{children}</>;
+  return (
+    <SessionProvider value={{ user, session }}>{children}</SessionProvider>
+  );
 }
