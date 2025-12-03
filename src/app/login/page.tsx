@@ -6,22 +6,30 @@ export const metadata: Metadata = {
 };
 
 interface LoginPageProps {
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
-export default function Page({ searchParams }: LoginPageProps) {
-  const callbackParam = searchParams?.callback;
+export default async function Page({ searchParams }: LoginPageProps) {
+  const resolvedSearchParams = await searchParams;
+  const callbackParam = resolvedSearchParams?.callback;
+  const reasonParam = resolvedSearchParams?.reason;
   const callback =
     typeof callbackParam === "string"
       ? callbackParam
       : Array.isArray(callbackParam)
         ? callbackParam[0]
         : null;
+  const reason =
+    typeof reasonParam === "string"
+      ? reasonParam
+      : Array.isArray(reasonParam)
+        ? reasonParam[0]
+        : null;
 
   return (
     <div className="flex min-h-svh w-full justify-center p-6 md:p-10">
       <div className="w-full max-w-sm">
-        <LoginForm callback={callback} />
+        <LoginForm callback={callback} reason={reason} />
       </div>
     </div>
   );

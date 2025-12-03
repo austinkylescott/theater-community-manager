@@ -1,15 +1,16 @@
+/** Client-side session context and provider */
 "use client";
 
 import type { ReactNode } from "react";
 import { createContext, useContext } from "react";
 import type { AppSession, AppUser } from "@/lib/auth";
 
-type SessionContextValue = {
+export type SessionContextValue = {
   user: AppUser | null;
   session: AppSession | null;
 };
 
-const SessionContext = createContext<SessionContextValue>({
+export const SessionContext = createContext<SessionContextValue>({
   user: null,
   session: null,
 });

@@ -13,10 +13,23 @@ export default async function SessionShell({
   children,
   redirectTo = "/login",
 }: SessionShellProps) {
-  const headersList = await headers();
-  const pathname = headersList.get("x-pathname") ?? "";
-  const search = headersList.get("x-search") ?? "";
-  const callbackPath = pathname ? `${pathname}${search}` : null;
+  const headersList = new Headers(await headers());
+  const rawCallback =
+    headersList.get("x-pathname") ||
+    headersList.get("next-url") ||
+    headersList.get("referer") ||
+    "";
+  let callbackPath: string | null = null;
+  if (rawCallback.startsWith("/")) {
+    callbackPath = rawCallback;
+  } else if (rawCallback.startsWith("http")) {
+    try {
+      const url = new URL(rawCallback);
+      callbackPath = `${url.pathname}${url.search}`;
+    } catch {
+      callbackPath = null;
+    }
+  }
 
   const sessionResult = await auth.api.getSession({
     headers: headersList,
@@ -28,10 +41,12 @@ export default async function SessionShell({
     Boolean(sessionResult?.session) || Boolean(sessionResult?.user);
 
   if (!isAuthenticated) {
-    const destination =
-      callbackPath && redirectTo
-        ? `${redirectTo}${redirectTo.includes("?") ? "&" : "?"}callback=${encodeURIComponent(callbackPath)}`
-        : redirectTo;
+    const searchParams = new URLSearchParams();
+    searchParams.set("reason", "signin");
+    if (callbackPath) {
+      searchParams.set("callback", callbackPath);
+    }
+    const destination = `${redirectTo}${redirectTo.includes("?") ? "&" : "?"}${searchParams.toString()}`;
     redirect(destination);
   }
 
