@@ -23,7 +23,30 @@ export const TheaterCardContainer = ({
   return <div className="my-4 grid gap-4 lg:grid-cols-2">{children}</div>;
 };
 
-const TheaterCard = () => {
+type TheaterCardProps = {
+  name: string;
+  tagline?: string | null;
+  address?: string | null;
+  upcomingShows?: string[];
+  showCount?: number;
+  memberCount?: number;
+};
+
+const TheaterCard = ({
+  name,
+  tagline,
+  address,
+  upcomingShows = [],
+  showCount,
+  memberCount,
+}: TheaterCardProps) => {
+  const initials = name
+    .split(" ")
+    .map((part) => part.at(0))
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+
   return (
     <Card>
       {/* Make the header a grid; 1 col on mobile, 2 on >=sm */}
@@ -31,13 +54,10 @@ const TheaterCard = () => {
         {/* Title */}
         <CardTitle className="flex items-center gap-2 text-lg text-balance md:text-2xl">
           <Avatar>
-            <AvatarImage
-              alt="Theater avatar"
-              src="https://github.com/shadcn.png"
-            />
-            <AvatarFallback>CN</AvatarFallback>
+            <AvatarImage alt={`${name} avatar`} />
+            <AvatarFallback>{initials || "TH"}</AvatarFallback>
           </Avatar>
-          The Focus Theater
+          {name}
         </CardTitle>
 
         {/* Actions (at right on >=sm) */}
@@ -54,26 +74,46 @@ const TheaterCard = () => {
         </CardAction>
 
         {/* Tagline */}
-        <CardDescription className="order-2 hidden flex-col gap-1 sm:col-span-2 sm:flex">
-          <span>Rochester&apos;s Home for Improv Comedy</span>
-        </CardDescription>
+        {tagline ? (
+          <CardDescription className="order-2 hidden flex-col gap-1 sm:col-span-2 sm:flex">
+            <span>{tagline}</span>
+          </CardDescription>
+        ) : null}
 
         {/* Address — span the full grid width */}
-        <CardDescription className="order-4 col-span-full">
-          <span className="flex flex-row items-center">
-            <MapPin aria-hidden="true" className="mr-1 size-[1em] shrink-0" />
-            <span>260 E. Main St. Rochester, NY 14604</span>
-          </span>
-        </CardDescription>
+        {address ? (
+          <CardDescription className="order-4 col-span-full">
+            <span className="flex flex-row items-center">
+              <MapPin aria-hidden="true" className="mr-1 size-[1em] shrink-0" />
+              <span>{address}</span>
+            </span>
+          </CardDescription>
+        ) : null}
       </CardHeader>
 
       <CardContent>
-        <p>Upcoming Shows</p>
-        <ul className="hidden sm:block">
-          <li>Ants to Gods</li>
-          <li>JFT & Friends</li>
-          <li>Nerds in a Basement</li>
-        </ul>
+        <div className="text-muted-foreground flex flex-wrap gap-3 text-sm">
+          {typeof showCount === "number" ? (
+            <span>
+              {showCount} upcoming show{showCount === 1 ? "" : "s"}
+            </span>
+          ) : null}
+          {typeof memberCount === "number" ? (
+            <span>
+              {memberCount} member{memberCount === 1 ? "" : "s"}
+            </span>
+          ) : null}
+        </div>
+        {upcomingShows.length ? (
+          <div className="mt-3">
+            <p className="font-medium">Upcoming Shows</p>
+            <ul className="hidden list-disc space-y-1 pl-5 sm:block">
+              {upcomingShows.map((title) => (
+                <li key={title}>{title}</li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
       </CardContent>
 
       <CardFooter>
