@@ -1,7 +1,15 @@
 "use client";
 
-import { createAuthClient } from "better-auth/react";
 import { magicLinkClient } from "better-auth/client/plugins";
+import { createAuthClient } from "better-auth/react";
+
+const getAuthError = (result: unknown) => {
+  if (result && typeof result === "object" && "error" in result) {
+    const error = (result as { error?: { message?: string } }).error;
+    return error?.message;
+  }
+  return undefined;
+};
 
 export const authClient = createAuthClient({
   plugins: [magicLinkClient()],
@@ -23,7 +31,11 @@ export const signInWithGitHub = async (options?: { callbackURL?: string }) => {
 
 export const signInWithMagicLink = async (email: string) => {
   try {
-    await authClient.signIn.magicLink({ email });
+    const result = await authClient.signIn.magicLink({ email });
+    const errorMessage = getAuthError(result);
+    if (errorMessage) {
+      throw new Error(errorMessage);
+    }
   } catch (error) {
     console.error("Magic link sign-in failed: ", error);
     throw error;
@@ -32,7 +44,11 @@ export const signInWithMagicLink = async (email: string) => {
 
 export const signOut = async () => {
   try {
-    await authClient.signOut();
+    const result = await authClient.signOut();
+    const errorMessage = getAuthError(result);
+    if (errorMessage) {
+      throw new Error(errorMessage);
+    }
   } catch (error) {
     console.error("Sign-out failed:", error);
     throw error;
@@ -46,8 +62,7 @@ export const signUpWithEmail = async (data: {
 }) => {
   try {
     const result = await authClient.signUp.email(data);
-    const errorMessage = (result as { error?: { message?: string } })?.error
-      ?.message;
+    const errorMessage = getAuthError(result);
     if (errorMessage) {
       throw new Error(errorMessage);
     }
@@ -63,8 +78,7 @@ export const signInWithEmail = async (data: {
 }) => {
   try {
     const result = await authClient.signIn.email(data);
-    const errorMessage = (result as { error?: { message?: string } })?.error
-      ?.message;
+    const errorMessage = getAuthError(result);
     if (errorMessage) {
       throw new Error(errorMessage);
     }

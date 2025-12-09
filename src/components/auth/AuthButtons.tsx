@@ -29,46 +29,38 @@ const AuthButtons = () => {
     }
   };
 
-  if (!mounted) {
-    return (
-      <div className="flex items-center gap-2">
-        <div className="hidden sm:block">
-          <div className="bg-muted pointer-events-none inline-flex h-9 animate-pulse items-center rounded-md border px-4 text-transparent select-none">
-            Sign up
-          </div>
-        </div>
-        <div className="bg-muted pointer-events-none inline-flex h-9 animate-pulse items-center rounded-md px-4 text-transparent select-none">
-          Login
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="flex items-center gap-2">
-      {loggedIn ? (
-        <span className="text-muted-foreground hidden text-xs sm:inline">
-          Signed in as {userLabel}
-          {user?.role ? ` (${user.role})` : ""}
-        </span>
+      {mounted && loggedIn ? (
+        <>
+          <span className="text-muted-foreground hidden text-xs sm:inline">
+            {userLabel}
+            {user?.role ? ` (${user.role})` : ""}
+          </span>
+          {canInvite ? (
+            <Button className="hidden sm:flex" variant="secondary">
+              Invite
+            </Button>
+          ) : null}
+          <Button onClick={handleSignOut}>Logout</Button>
+        </>
       ) : null}
-      {loggedIn && canInvite ? (
-        <Button className="hidden sm:flex" variant="secondary">
-          Invite
-        </Button>
+      {mounted && !loggedIn ? (
+        <>
+          <Button asChild variant="outline">
+            <a href="/signup">Sign up</a>
+          </Button>
+          <Button asChild>
+            <a href="/login">Log in</a>
+          </Button>
+        </>
       ) : null}
-      {!loggedIn ? (
-        <Button asChild variant="outline" className="hidden sm:inline-flex">
-          <a href="/signup">Sign up</a>
-        </Button>
+      {!mounted ? (
+        <>
+          <div className="bg-muted pointer-events-none inline-flex h-9 min-w-16 animate-pulse items-center rounded-md border px-4 text-transparent select-none" />
+          <div className="bg-muted pointer-events-none inline-flex h-9 min-w-14 animate-pulse items-center rounded-md px-4 text-transparent select-none" />
+        </>
       ) : null}
-      {loggedIn ? (
-        <Button onClick={handleSignOut}>Logout</Button>
-      ) : (
-        <Button asChild>
-          <a href="/login">Login</a>
-        </Button>
-      )}
     </div>
   );
 };

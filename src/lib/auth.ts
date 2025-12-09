@@ -15,7 +15,7 @@ export const auth = betterAuth({
   plugins: [
     magicLink({
       sendMagicLink: async ({ email, token, url }, request) => {
-        //sendEmail to user
+        console.info("Magic link requested", { email, token, url, request });
       },
     }),
   ],
@@ -38,11 +38,3 @@ export const auth = betterAuth({
 
 export type AppSession = InferSession<typeof auth>;
 export type AppUser = InferUser<typeof auth>;
-
-export const hasRole = (
-  user: Pick<AppUser, "role"> | null | undefined,
-  roles: Role | Role[],
-) => {
-  const allowedRoles = Array.isArray(roles) ? roles : [roles];
-  return Boolean(user && allowedRoles.includes(user.role as Role));
-};

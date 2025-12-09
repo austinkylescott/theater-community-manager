@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, FormEvent } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { signInWithEmail, signInWithGitHub } from "@/lib/auth-client";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -32,10 +32,14 @@ type LoginFormProps = React.ComponentProps<typeof Card> & {
 
 export function LoginForm({ callback, reason, ...props }: LoginFormProps) {
   const router = useRouter();
-  const redirectTarget = callback || "/theaters";
+  const searchParams = useSearchParams();
+  const callbackParam = callback ?? searchParams.get("callback");
+  const redirectTarget = callbackParam || "/theaters";
   const signupHref = callback
     ? `/signup?callback=${encodeURIComponent(callback)}`
-    : "/signup";
+    : callbackParam
+      ? `/signup?callback=${encodeURIComponent(callbackParam)}`
+      : "/signup";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);

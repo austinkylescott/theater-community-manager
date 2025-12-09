@@ -22,7 +22,7 @@ model User {
   performer   PerformerProfile?
   createdAt   DateTime          @default(now())
   updatedAt   DateTime          @updatedAt
-  LineupSlot  LineupSlot[]
+  lineupSlots LineupSlot[] @relation("PerformerSlots")
 }
 
 model Theater {
@@ -35,12 +35,14 @@ model Theater {
 }
 
 model Membership {
-  id        String  @id @default(cuid())
+  id        String   @id @default(cuid())
   userId    String
   theaterId String
   role      Role
-  user      User    @relation(fields: [userId], references: [id])
-  theater   Theater @relation(fields: [theaterId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+  theater   Theater  @relation(fields: [theaterId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([userId, theaterId])
 }
@@ -75,13 +77,17 @@ model Show {
 }
 
 model LineupSlot {
-  id          String  @id @default(cuid())
+  id          String   @id @default(cuid())
   showId      String
   order       Int
   label       String
   performerId String?
-  show        Show    @relation(fields: [showId], references: [id])
-  performer   User?   @relation(fields: [performerId], references: [id])
+  show        Show     @relation(fields: [showId], references: [id])
+  performer   User?    @relation("PerformerSlots", fields: [performerId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([showId, order])
 }
 
 model Session {

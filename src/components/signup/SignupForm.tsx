@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, FormEvent } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { signInWithGitHub, signUpWithEmail } from "@/lib/auth-client";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -38,10 +38,14 @@ type SignupFormProps = React.ComponentProps<typeof Card> & {
 
 export function SignupForm({ callback, ...props }: SignupFormProps) {
   const router = useRouter();
-  const redirectTarget = callback || "/theaters";
+  const searchParams = useSearchParams();
+  const callbackParam = callback ?? searchParams.get("callback");
+  const redirectTarget = callbackParam || "/theaters";
   const loginHref = callback
     ? `/login?callback=${encodeURIComponent(callback)}`
-    : "/login";
+    : callbackParam
+      ? `/login?callback=${encodeURIComponent(callbackParam)}`
+      : "/login";
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -77,11 +81,20 @@ export function SignupForm({ callback, ...props }: SignupFormProps) {
       return;
     }
 
-    const cleanedName = parsed.data.name.trim();
+    const {
+      email: parsedEmail,
+      password: parsedPassword,
+      name: parsedName,
+    } = parsed.data;
+    const cleanedName = parsedName.trim();
 
     try {
       setIsSubmitting(true);
-      await signUpWithEmail({ email, password, name: cleanedName });
+      await signUpWithEmail({
+        email: parsedEmail,
+        password: parsedPassword,
+        name: cleanedName,
+      });
       router.replace(redirectTarget);
       router.refresh();
     } catch (err) {

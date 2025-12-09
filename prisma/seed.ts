@@ -1,5 +1,4 @@
-/* eslint-disable no-console */
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Role } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function main() {
@@ -7,22 +6,26 @@ async function main() {
     prisma.user.upsert({
       where: { email: "manager@example.com" },
       update: {},
-      create: { email: "manager@example.com", name: "Manager" },
+      create: {
+        email: "manager@example.com",
+        name: "Manager",
+        role: Role.MANAGER,
+      },
     }),
     prisma.user.upsert({
       where: { email: "ali@example.com" },
       update: {},
-      create: { email: "ali@example.com", name: "Ali" },
+      create: { email: "ali@example.com", name: "Ali", role: Role.PERFORMER },
     }),
     prisma.user.upsert({
       where: { email: "ben@example.com" },
       update: {},
-      create: { email: "ben@example.com", name: "Ben" },
+      create: { email: "ben@example.com", name: "Ben", role: Role.PERFORMER },
     }),
     prisma.user.upsert({
       where: { email: "cam@example.com" },
       update: {},
-      create: { email: "cam@example.com", name: "Cam" },
+      create: { email: "cam@example.com", name: "Cam", role: Role.PERFORMER },
     }),
   ]);
 
@@ -45,10 +48,10 @@ async function main() {
 
   await prisma.membership.createMany({
     data: [
-      { userId: manager.id, theaterId: theater.id, role: "MANAGER" },
-      { userId: p1.id, theaterId: theater.id, role: "PERFORMER" },
-      { userId: p2.id, theaterId: theater.id, role: "PERFORMER" },
-      { userId: p3.id, theaterId: theater.id, role: "PERFORMER" },
+      { userId: manager.id, theaterId: theater.id, role: Role.MANAGER },
+      { userId: p1.id, theaterId: theater.id, role: Role.PERFORMER },
+      { userId: p2.id, theaterId: theater.id, role: Role.PERFORMER },
+      { userId: p3.id, theaterId: theater.id, role: Role.PERFORMER },
     ],
     skipDuplicates: true,
   });
